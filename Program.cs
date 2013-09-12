@@ -1,23 +1,65 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace trafficlight
 {
   internal class Program
   {
+    private TrafficLightInterface _trafficLight;
+
     public static void Main(string[] args)
     {
-      var ifc = new RelayBoardInterface();
-      
-      for (int i = 0; i < 1000; i++)
+      new Program().PollMetaswitchJira();
+    }
+
+    public Program()
+    {
+      _trafficLight = new TrafficLightInterface();
+    }
+
+    public void Disco()
+    {
+      var random = new Random();
+      while (true)
       {
-        ifc.SetPins((byte)i);
-        Thread.Sleep(300);
+        _trafficLight.SetPins((byte)random.Next());
+        Thread.Sleep(200);
+      }
+    }
+
+    public void PollMetaswitchJira()
+    {
+      var poller = new JiraPoller("http://jenkins.zoo.lan/view/CustomerX/api/xml", OnBuildStateFetched);
+      poller.Poll();
+    }
+
+    private void OnBuildStateFetched(JiraPoller.BuildState state)
+    {
+      switch (state)
+      {
+        case JiraPoller.BuildState.red:
+          _trafficLight.SetRYG(true, false, false);
+          break;
+        case JiraPoller.BuildState.red_anime:
+          _trafficLight.SetRYG(true, true, false);
+          break;
+        case JiraPoller.BuildState.yellow:
+          _trafficLight.SetRYG(false, true, false);
+          break;
+        case JiraPoller.BuildState.yellow_anime:
+          _trafficLight.SetRYG(true, true, false);
+          break;
+        case JiraPoller.BuildState.blue:
+          _trafficLight.SetRYG(false, false, true);
+          break;
+        case JiraPoller.BuildState.blue_anime:
+          _trafficLight.SetRYG(false, true, true);
+          break;
+        case JiraPoller.BuildState.grey:
+          _trafficLight.SetRYG(false, false, false);
+          break;
+        default:
+          throw new Exception("Unrecognised state: " + state);
       }
     }
   }
