@@ -9,7 +9,7 @@ namespace trafficlight
 
     public static void Main(string[] args)
     {
-      new Program().PollMetaswitchJira();
+      new Program().Disco();
     }
 
     public Program()
@@ -27,7 +27,7 @@ namespace trafficlight
       }
     }
 
-    public void PollMetaswitchJira()
+    public void PollJira()
     {
       var poller = new JiraPoller("http://jenkins.zoo.lan/view/CustomerX/api/xml", OnBuildStateFetched);
       poller.Poll();
