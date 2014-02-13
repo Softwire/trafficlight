@@ -57,8 +57,9 @@ namespace trafficlight.TrafficLightControls
                     Console.WriteLine("Fetched {0} ({1} bytes in {2} ms)", _listViewUrl, apiData.Length, sw.ElapsedMilliseconds);
 
                     var apiDoc = XDocument.Parse(apiData);
-                    var colours = apiDoc.Descendants("color").Select(c => (BuildState)Enum.Parse(typeof(BuildState), c.Value));
+                    var colours = apiDoc.Descendants("color").Select(c => (BuildState)Enum.Parse(typeof(BuildState), c.Value)).ToList();
                     var minColour = colours.Min();
+                    Console.WriteLine("Monitoring {0} builds", colours.Count());
                     Console.WriteLine("Colour is {0}", minColour);
 
                     OnBuildStateFetched(minColour);
